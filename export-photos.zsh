@@ -60,6 +60,7 @@ export_album() {
         --album "${album}" \
         "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${album}" \
         ;
+        echo "\033[0;32mFinished processing album: $album\033[0m"  # Changed echo to green output
 }
 
 # Define a function wrapping osxphotos export with default parameters to all photos/videos between two dates
@@ -86,6 +87,7 @@ export_by_date() {
     --export-by-date \
     "${PHOTO_BACKUP_DIR}/${by_date_dir_name}" \
     ;
+    echo "\033[0;32mFinished processing all photos between $FROM_DATE and $TO_DATE\033[0m";  # Changed echo to green output
 }
 
 export_by_person() {
@@ -95,21 +97,22 @@ export_by_person() {
     echo "\033[0;32mProcessing all photos by person $1\033[0m";  # Changed echo to green output
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${person}/${REPORTS_DIR_NAME}";
     osxphotos export \
-    --library ${PHOTOS_LIBRARY_DIR} \
-    --download-missing \
-    --use-photokit \
-    --exiftool \
-    --touch-file \
-    --sidecar XMP \
-    --update \
-    --ramdb \
-    --checkpoint $CHECKPOINTS \
-    --report "${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${person}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite" \
-    \
-    --person $person \
-    --export-by-date \
+        --library ${PHOTOS_LIBRARY_DIR} \
+        --download-missing \
+        --use-photokit \
+        --exiftool \
+        --touch-file \
+        --sidecar XMP \
+        --update \
+        --ramdb \
+        --checkpoint $CHECKPOINTS \
+        --report "${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${person}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite" \
+        \
+        --person $person \
+        --export-by-date \
     "${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${person}" \
     ;
+    echo "\033[0;32mFinished processing all photos by person $1\033[0m";  # Changed echo to green output
 }
 
 # Cycle through each album to backup
@@ -141,5 +144,6 @@ done
 #) &
 
 wait
+echo "All album and person exports have completed."
 
 ## --post-command exported "echo {shell_quote,{filepath}{comma}{,+keyword,}} >> {shell_quote,{export_dir}/exported.txt}"
