@@ -50,6 +50,7 @@ export_album() {
         --download-missing \
         --use-photokit \
         --exiftool \
+        --touch-file \
         --sidecar XMP \
         --update \
         --ramdb \
@@ -73,6 +74,7 @@ export_by_date() {
     --download-missing \
     --use-photokit \
     --exiftool \
+    --touch-file \
     --sidecar XMP \
     --update \
     --ramdb \
@@ -97,6 +99,7 @@ export_by_person() {
     --download-missing \
     --use-photokit \
     --exiftool \
+    --touch-file \
     --sidecar XMP \
     --update \
     --ramdb \
