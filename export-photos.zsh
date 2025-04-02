@@ -1,11 +1,14 @@
 #!/bin/zsh
 
+# This script will backup photo albums from the Photos app to a specified directory.
+# To increase its speed, it uses the `--ramdb` option to store the database in RAM, but
+# saves to disk every 100 checkpoints/exports.
+
 PHOTO_BACKUP_DIR='/Users/willjasen/Library/Mobile Documents/com~apple~CloudDocs/Photos app backup';
 FROM_DATE='2025-03-01';
 TO_DATE='2025-04-30';
-TIMESTAMP=$(date "+%Y%m%d%H%M%S")
-PHOTOS_ALBUMS=("Food" "Health")
 REPORTS_DIR_NAME="-reports-"
+PHOTOS_ALBUMS=("Food" "Health")
 
 # Define a function wrapping osxphotos export with default parameters
 custom_export() {
@@ -28,6 +31,7 @@ custom_export() {
 
 # Cycle through each album to backup
 for album in "${PHOTOS_ALBUMS[@]}"; do
+    TIMESTAMP=$(date "+%Y%m%d%H%M%S")
     mkdir -p "${PHOTO_BACKUP_DIR}/${album}"
     custom_export $album
 done
