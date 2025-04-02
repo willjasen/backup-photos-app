@@ -128,11 +128,9 @@ export_by_person() {
 ) &
 
 # Export all photos/videos by person
-(
-    for person in "${PEOPLE[@]}"; do
+for person in "${PEOPLE[@]}"; do
     export_by_person $person
 done
-) &
 
 # Export all photos between dates
 # export_by_date
