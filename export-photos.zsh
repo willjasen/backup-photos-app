@@ -20,15 +20,31 @@ CHECKPOINTS=100;
 FROM_DATE='2025-03-01';
 TO_DATE='2025-04-30';
 
-PHOTOS_ALBUMS=();
-PEOPLE=();
+# Replace empty PHOTO_ALBUMS array with file input.
+ALBUMS_FILE="${PHOTO_BACKUP_DIR}/albums.txt"
+if [[ -f "$ALBUMS_FILE" ]]; then
+    PHOTO_ALBUMS=("${(f)$(<"$ALBUMS_FILE")}")
+else
+    echo "People file not found: $ALBUMS_FILE"
+    PHOTO_ALBUMS=();
+fi
+
+# Replace empty PEOPLE array with file input.
+PEOPLE_FILE="${PHOTO_BACKUP_DIR}/people.txt"
+if [[ -f "$PEOPLE_FILE" ]]; then
+    PEOPLE=("${(f)$(<"$PEOPLE_FILE")}")
+else
+    echo "People file not found: $PEOPLE_FILE"
+    PEOPLE=();
+fi
 
 # Define a function wrapping osxphotos export with default parameters to export an album
 export_album() {
     TIMESTAMP=$(date "+%Y%m%d%H%M%S")
     local album="$1"
+    local by_album_dir_name="--by-album--";
     echo "\033[0;32mProcessing album: $album\033[0m"  # Changed echo to green output
-    mkdir -p "${PHOTO_BACKUP_DIR}/${album}/${REPORTS_DIR_NAME}"   # Ensure reports directory exists
+    mkdir -p "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${album}/${REPORTS_DIR_NAME}"   # Ensure reports directory exists
     osxphotos export \
         --library ${PHOTOS_LIBRARY_DIR} \
         --download-missing \
@@ -37,10 +53,10 @@ export_album() {
         --ramdb \
         --checkpoint $CHECKPOINTS \
         --export-by-date \
-        --report "${PHOTO_BACKUP_DIR}/${album}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite" \
+        --report "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${album}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite" \
         \
         --album "${album}" \
-        "${PHOTO_BACKUP_DIR}/${album}" \
+        "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${album}" \
         ;
 }
 
@@ -88,7 +104,7 @@ export_by_person() {
 }
 
 # Cycle through each album to backup
-for album in "${PHOTOS_ALBUMS[@]}"; do
+for album in "${PHOTO_ALBUMS[@]}"; do
     TIMESTAMP=$(date "+%Y%m%d%H%M%S")
     export_album $album
 done
