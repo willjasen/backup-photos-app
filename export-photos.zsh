@@ -12,7 +12,7 @@
 # https://github.com/RhetTbull/osxphotos?tab=readme-ov-file#command-line-reference-export
 #
 
-PHOTO_BACKUP_DIR='/Users/willjasen/Library/Mobile Documents/com~apple~CloudDocs/Photos app backup';
+PHOTO_BACKUP_DIR='/Users/willjasen/Application Data/Syncthing/Photos app';
 PHOTOS_LIBRARY_DIR="/Users/willjasen/Pictures/Photos Library.photoslibrary";
 REPORTS_DIR_NAME="-reports-";
 CHECKPOINTS=100;
@@ -65,7 +65,7 @@ export_album() {
 # Define a function wrapping osxphotos export with default parameters to all photos/videos between two dates
 export_by_date() {
     TIMESTAMP=$(date "+%Y%m%d%H%M%S")
-    local by_date_dir_name="-by-date-";
+    local by_date_dir_name="--by-date--";
     echo "\033[0;32mProcessing all photos between $FROM_DATE and $TO_DATE\033[0m";  # Changed echo to green output
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_date_dir_name}/${REPORTS_DIR_NAME}";
     osxphotos export \
@@ -89,7 +89,7 @@ export_by_date() {
 export_by_person() {
     TIMESTAMP=$(date "+%Y%m%d%H%M%S")
     local person=$1
-    local by_person_dir_name="-by-person-";
+    local by_person_dir_name="--by-person--";
     echo "\033[0;32mProcessing all photos by person $1\033[0m";  # Changed echo to green output
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${person}/${REPORTS_DIR_NAME}";
     osxphotos export \
