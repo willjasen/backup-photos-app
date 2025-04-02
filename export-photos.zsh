@@ -15,6 +15,7 @@
 #
 
 PHOTO_BACKUP_DIR='/Users/willjasen/Library/Mobile Documents/com~apple~CloudDocs/Photos app backup';
+PHOTOS_LIBRARY_DIR="/Users/willjasen/Pictures/Photos Library.photoslibrary";
 FROM_DATE='2025-03-01';
 TO_DATE='2025-04-30';
 REPORTS_DIR_NAME="-reports-";
@@ -27,7 +28,7 @@ export_album() {
   echo "Processing album: $album"  # Added echo for album
   mkdir -p "${PHOTO_BACKUP_DIR}/${album}/${REPORTS_DIR_NAME}"   # Ensure reports directory exists
   osxphotos export \
-    --library ~/Pictures/Photos\ Library.photoslibrary \
+    --library ${PHOTOS_LIBRARY_DIR} \
     --download-missing \
     --use-photokit \
     --update \
@@ -35,6 +36,7 @@ export_album() {
     --checkpoint $CHECKPOINTS \
     --export-by-date \
     --report "${PHOTO_BACKUP_DIR}/${album}/${REPORTS_DIR_NAME}/export-${TIMESTAMP}.sqlite" \
+    \
     --album "${album}" \
     "${PHOTO_BACKUP_DIR}/${album}" \
     ;
@@ -46,15 +48,17 @@ export_by_date() {
     echo "Processing all photos between $FROM_DATE and $TO_DATE";
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_date_dir_name}/${REPORTS_DIR_NAME}";
     osxphotos export \
-    --library ~/Pictures/Photos\ Library.photoslibrary \
+    --library ${PHOTOS_LIBRARY_DIR} \
+    --download-missing \
+    --use-photokit \
+    --update \
+    --ramdb \
+    --checkpoint $CHECKPOINTS \
     --export-by-date \
+    --report "${PHOTO_BACKUP_DIR}/${by_date_dir_name}/${REPORTS_DIR_NAME}/export-${TIMESTAMP}.sqlite" \
+    \
     --from-date "$FROM_DATE" \
     --to-date "$TO_DATE" \
-    --update \
-    --checkpoint $CHECKPOINTS \
-    --download-missing --use-photokit \
-    --ramdb \
-    --report "${PHOTO_BACKUP_DIR}/${by_date_dir_name}/${REPORTS_DIR_NAME}/export-${TIMESTAMP}.sqlite" \
     "${PHOTO_BACKUP_DIR}/${by_date_dir_name}" \
     ;
 }
