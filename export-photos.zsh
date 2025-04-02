@@ -4,6 +4,8 @@
 # This script will backup photo albums from the Photos app to a specified directory.
 # It uses the `osxphotos` command-line tool to export photos from the Photos app.
 #
+# Though the word "photos" is used here, it also backs up videos.
+#
 # If the photos/videos are in iCloud, it will download them first.
 #
 # To increase its speed, it uses the `--ramdb` option to store the database in RAM, but
@@ -15,11 +17,12 @@
 PHOTO_BACKUP_DIR='/Users/willjasen/Library/Mobile Documents/com~apple~CloudDocs/Photos app backup';
 FROM_DATE='2025-03-01';
 TO_DATE='2025-04-30';
-REPORTS_DIR_NAME="-reports-"
-PHOTOS_ALBUMS=("Food" "Health")
+REPORTS_DIR_NAME="-reports-";
+CHECKPOINTS=100;
+PHOTOS_ALBUMS=("Food");
 
-# Define a function wrapping osxphotos export with default parameters
-custom_export() {
+# Define a function wrapping osxphotos export with default parameters to export an album
+export_album() {
   local album="$1"
   echo "Processing album: $album"  # Added echo for album
   mkdir -p "${PHOTO_BACKUP_DIR}/${album}/${REPORTS_DIR_NAME}"   # Ensure reports directory exists
@@ -29,7 +32,7 @@ custom_export() {
     --use-photokit \
     --update \
     --ramdb \
-    --checkpoint 100 \
+    --checkpoint $CHECKPOINTS \
     --export-by-date \
     --report "${PHOTO_BACKUP_DIR}/${album}/${REPORTS_DIR_NAME}/export-${TIMESTAMP}.sqlite" \
     --album "${album}" \
@@ -37,21 +40,35 @@ custom_export() {
     ;
 }
 
+# Define a function wrapping osxphotos export with default parameters to all photos/videos between two dates
+export_by_date() {
+    local by_date_dir_name="-by-date-";
+    echo "Processing all photos between $FROM_DATE and $TO_DATE";
+    mkdir -p "${PHOTO_BACKUP_DIR}/${by_date_dir_name}/${REPORTS_DIR_NAME}";
+    osxphotos export \
+    --library ~/Pictures/Photos\ Library.photoslibrary \
+    --export-by-date \
+    --from-date "$FROM_DATE" \
+    --to-date "$TO_DATE" \
+    --update \
+    --checkpoint $CHECKPOINTS \
+    --download-missing --use-photokit \
+    --ramdb \
+    --report "${PHOTO_BACKUP_DIR}/${by_date_dir_name}/${REPORTS_DIR_NAME}/export-${TIMESTAMP}.sqlite" \
+    "${PHOTO_BACKUP_DIR}/${by_date_dir_name}" \
+    ;
+}
+
 # Cycle through each album to backup
 for album in "${PHOTOS_ALBUMS[@]}"; do
     TIMESTAMP=$(date "+%Y%m%d%H%M%S")
     mkdir -p "${PHOTO_BACKUP_DIR}/${album}"
-    custom_export $album
+    export_album $album
 done
 
-# osxphotos export \
-#     --library ~/Pictures/Photos\ Library.photoslibrary \
-#     --export-by-date \
-#     --from-date "$FROM_DATE" \
-#     --to-date "$TO_DATE" \
-#     --update \
-#     --checkpoint 1000 \
-#     --download-missing --use-photokit \
-#     --ramdb \
-#     --report "${PHOTO_HOME}/reports/export-${TIMESTAMP}.sqlite" \
-#     ;
+# Export all photos between dates
+TIMESTAMP=$(date "+%Y%m%d%H%M%S")
+export_by_date
+
+
+## --post-command exported "echo {shell_quote,{filepath}{comma}{,+keyword,}} >> {shell_quote,{export_dir}/exported.txt}" 
