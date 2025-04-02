@@ -55,7 +55,6 @@ export_album() {
         --update \
         --ramdb \
         --checkpoint $CHECKPOINTS \
-        --export-by-date \
         --report "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${album}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite" \
         \
         --album "${album}" \
@@ -79,11 +78,12 @@ export_by_date() {
     --update \
     --ramdb \
     --checkpoint $CHECKPOINTS \
-    --export-by-date \
+    
     --report "${PHOTO_BACKUP_DIR}/${by_date_dir_name}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite" \
     \
     --from-date "$FROM_DATE" \
     --to-date "$TO_DATE" \
+    --export-by-date \
     "${PHOTO_BACKUP_DIR}/${by_date_dir_name}" \
     ;
 }
@@ -104,10 +104,10 @@ export_by_person() {
     --update \
     --ramdb \
     --checkpoint $CHECKPOINTS \
-    --export-by-date \
     --report "${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${person}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite" \
     \
     --person $person \
+    --export-by-date \
     "${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${person}" \
     ;
 }
