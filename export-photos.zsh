@@ -9,6 +9,8 @@
 # To increase its speed, it uses the `--ramdb` option to store the database in RAM, but
 # saves to disk every 100 checkpoints/exports.
 #
+# https://github.com/RhetTbull/osxphotos?tab=readme-ov-file#command-line-reference-export
+#
 
 PHOTO_BACKUP_DIR='/Users/willjasen/Library/Mobile Documents/com~apple~CloudDocs/Photos app backup';
 FROM_DATE='2025-03-01';
@@ -42,6 +44,14 @@ for album in "${PHOTOS_ALBUMS[@]}"; do
     custom_export $album
 done
 
-#
-# https://github.com/RhetTbull/osxphotos?tab=readme-ov-file#command-line-reference-export
-#
+# osxphotos export \
+#     --library ~/Pictures/Photos\ Library.photoslibrary \
+#     --export-by-date \
+#     --from-date "$FROM_DATE" \
+#     --to-date "$TO_DATE" \
+#     --update \
+#     --checkpoint 1000 \
+#     --download-missing --use-photokit \
+#     --ramdb \
+#     --report "${PHOTO_HOME}/reports/export-${TIMESTAMP}.sqlite" \
+#     ;
