@@ -16,10 +16,12 @@
 
 PHOTO_BACKUP_DIR='/Users/willjasen/Library/Mobile Documents/com~apple~CloudDocs/Photos app backup';
 PHOTOS_LIBRARY_DIR="/Users/willjasen/Pictures/Photos Library.photoslibrary";
-FROM_DATE='2025-03-01';
-TO_DATE='2025-04-30';
 REPORTS_DIR_NAME="-reports-";
 CHECKPOINTS=100;
+
+FROM_DATE='2025-03-01';
+TO_DATE='2025-04-30';
+
 PHOTOS_ALBUMS=();
 PEOPLE=();
 
