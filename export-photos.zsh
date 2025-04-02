@@ -1,8 +1,14 @@
 #!/bin/zsh
 
+#
 # This script will backup photo albums from the Photos app to a specified directory.
+# It uses the `osxphotos` command-line tool to export photos from the Photos app.
+#
+# If the photos/videos are in iCloud, it will download them first.
+#
 # To increase its speed, it uses the `--ramdb` option to store the database in RAM, but
 # saves to disk every 100 checkpoints/exports.
+#
 
 PHOTO_BACKUP_DIR='/Users/willjasen/Library/Mobile Documents/com~apple~CloudDocs/Photos app backup';
 FROM_DATE='2025-03-01';
