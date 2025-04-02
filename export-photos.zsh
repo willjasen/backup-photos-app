@@ -49,6 +49,8 @@ export_album() {
         --library ${PHOTOS_LIBRARY_DIR} \
         --download-missing \
         --use-photokit \
+        --exiftool \
+        --sidecar XMP \
         --update \
         --ramdb \
         --checkpoint $CHECKPOINTS \
@@ -70,6 +72,8 @@ export_by_date() {
     --library ${PHOTOS_LIBRARY_DIR} \
     --download-missing \
     --use-photokit \
+    --exiftool \
+    --sidecar XMP \
     --update \
     --ramdb \
     --checkpoint $CHECKPOINTS \
@@ -92,6 +96,8 @@ export_by_person() {
     --library ${PHOTOS_LIBRARY_DIR} \
     --download-missing \
     --use-photokit \
+    --exiftool \
+    --sidecar XMP \
     --update \
     --ramdb \
     --checkpoint $CHECKPOINTS \
