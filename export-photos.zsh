@@ -113,10 +113,16 @@ export_by_person() {
 }
 
 # Cycle through each album to backup
-for album in "${PHOTO_ALBUMS[@]}"; do
-    TIMESTAMP=$(date "+%Y%m%d%H%M%S")
-    export_album $album
-done
+#for album in "${PHOTO_ALBUMS[@]}"; do
+#    TIMESTAMP=$(date "+%Y%m%d%H%M%S")
+#    export_album $album
+#done
+
+(
+  for album in "${PHOTO_ALBUMS[@]}"; do
+    export_album "$album"
+  done
+) &
 
 # Export all photos/videos by person
 for person in "${PEOPLE[@]}"; do
@@ -126,5 +132,12 @@ done
 # Export all photos between dates
 # export_by_date
 
+#(
+#  for person in "${PEOPLE[@]}"; do
+#    export_by_person "$person"
+#  done
+#) &
+
+wait
 
 ## --post-command exported "echo {shell_quote,{filepath}{comma}{,+keyword,}} >> {shell_quote,{export_dir}/exported.txt}"
