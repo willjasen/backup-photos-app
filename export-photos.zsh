@@ -125,21 +125,17 @@ export_by_person() {
   for album in "${PHOTO_ALBUMS[@]}"; do
     export_album "$album"
   done
+  echo "\033[0;32mFinished processing all albums\033[0m"  # Changed echo to green output
 ) &
 
 # Export all photos/videos by person
 for person in "${PEOPLE[@]}"; do
     export_by_person $person
 done
+echo "\033[0;32mFinished processing all people\033[0m"  # Changed echo to green output
 
 # Export all photos between dates
 # export_by_date
-
-#(
-#  for person in "${PEOPLE[@]}"; do
-#    export_by_person "$person"
-#  done
-#) &
 
 wait
 echo "All album and person exports have completed."
