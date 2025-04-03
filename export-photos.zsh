@@ -47,6 +47,7 @@ export_album() {
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${album}/${REPORTS_DIR_NAME}"   # Ensure reports directory exists
     osxphotos export \
         --library ${PHOTOS_LIBRARY_DIR} \
+        --verbose \
         --download-missing \
         --use-photokit \
         --exiftool \
@@ -71,6 +72,7 @@ export_by_date() {
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_date_dir_name}/${REPORTS_DIR_NAME}";
     osxphotos export \
     --library ${PHOTOS_LIBRARY_DIR} \
+    --verbose \
     --download-missing \
     --use-photokit \
     --exiftool \
@@ -98,6 +100,7 @@ export_by_person() {
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${person}/${REPORTS_DIR_NAME}";
     osxphotos export \
         --library ${PHOTOS_LIBRARY_DIR} \
+        --verbose \
         --download-missing \
         --use-photokit \
         --exiftool \
@@ -121,23 +124,24 @@ export_by_person() {
 #    export_album $album
 #done
 
-(
-  for album in "${PHOTO_ALBUMS[@]}"; do
-    export_album "$album"
-  done
-  echo "\033[0;32mFinished processing all albums\033[0m"  # Changed echo to green output
-) &
+
+#for album in "${PHOTO_ALBUMS[@]}"; do
+#    ( export_album "$album" ) &
+#done
+#wait
+#echo "\033[0;32mFinished processing all albums\033[0m"  # Changed echo to green output
 
 # Export all photos/videos by person
 for person in "${PEOPLE[@]}"; do
-    export_by_person $person
+    ( export_by_person $person ) &
 done
+wait
 echo "\033[0;32mFinished processing all people\033[0m"  # Changed echo to green output
 
 # Export all photos between dates
 # export_by_date
 
-wait
+# wait
 echo "All album and person exports have completed."
 
 ## --post-command exported "echo {shell_quote,{filepath}{comma}{,+keyword,}} >> {shell_quote,{export_dir}/exported.txt}"
