@@ -23,8 +23,8 @@ def unnamed_faces(photos: list[PhotoInfo]) -> list[PhotoInfo]:
     face_photos = []
     for photo in photos:
         for face in photo.face_info:
-            # if face.quality > 0.2 and not face.name:
-            if face.quality > 0.2 and (face.name is None or face.name.strip() == ""):
+            # if face.quality > -1.0 and not face.name:
+            if face.quality > -1.0 and (face.name is None or face.name.strip() == ""):
                 face_photos.append(photo)
                 break
     return face_photos
