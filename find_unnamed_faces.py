@@ -7,10 +7,20 @@ from osxphotos import PhotoInfo
 
 
 def unnamed_faces(photos: list[PhotoInfo]) -> list[PhotoInfo]:
-    """your query function should take a list of PhotoInfo objects and return a list of PhotoInfo objects (or empty list)"""
+    # your query function should take a list of PhotoInfo objects and return a list of PhotoInfo objects (or empty list)"""
 
     # filter out photos with no face info
     photos = [p for p in photos if p.face_info]
+    if not photos:
+        return []
+
+    # filter out screenshots
+    photos = [p for p in photos if "screenshot" not in p.filename.lower()]
+    if not photos:
+        return []
+
+    # filter out .png images
+    photos = [p for p in photos if not p.filename.lower().endswith(".png")]
     if not photos:
         return []
 
@@ -18,7 +28,6 @@ def unnamed_faces(photos: list[PhotoInfo]) -> list[PhotoInfo]:
     face_photos = []
     for photo in photos:
         for face in photo.face_info:
-            # if face.quality > -1.0 and not face.name:
             if face.quality > -1.0 and (face.name is None or face.name.strip() == ""):
                 face_photos.append(photo)
                 break
