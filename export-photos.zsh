@@ -29,10 +29,10 @@ else
     PHOTO_ALBUMS=();
 fi
 
-# Replace empty PEOPLE array with file input, skipping lines that start with a # sign.
+# Replace empty PEOPLE array with file input, skipping lines that start with a # sign or are blank.
 PEOPLE_FILE="${PHOTO_BACKUP_DIR}/people.txt"
 if [[ -f "$PEOPLE_FILE" ]]; then
-    PEOPLE=("${(f)$(grep -v '^#' "$PEOPLE_FILE")}")
+    PEOPLE=("${(f)$(grep -v '^\s*#' "$PEOPLE_FILE" | grep -v '^\s*$')}")
 else
     echo "People file not found: $PEOPLE_FILE"
     PEOPLE=();
@@ -134,7 +134,7 @@ export_by_person() {
 # echo "\033[0;32mFinished processing all albums\033[0m"
 
 # Export all photos/videos by person, using parallel processing with a maxiumum of 2 concurrent jobs
-max_jobs=2;
+max_jobs=3;
 for person in "${PEOPLE[@]}"; do
     ((i=i%max_jobs)); ((i++==0)) && wait
     export_by_person $person &
