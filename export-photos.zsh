@@ -125,7 +125,7 @@ export_by_person() {
 #####  --MAIN SCRIPT--
 #####
 
-# # Export all photos/videos by album, using parallel processing with a maxiumum of 2 concurrent jobs
+# # Export all photos/videos by album, using parallel processing with a maxiumum number of concurrent jobs
 # max_jobs=2;
 # for album in "${PHOTO_ALBUMS[@]}"; do
 #     ((i=i%max_jobs)); ((i++==0)) && wait
@@ -134,7 +134,7 @@ export_by_person() {
 # wait
 # echo "\033[0;32mFinished processing all albums\033[0m"
 
-# Export all photos/videos by person, using parallel processing with a maximum number of jobs at once
+# Export all photos/videos by person, using parallel processing with a maximum number of current jobs
 max_jobs=2;
 total_people=${#PEOPLE[@]};
 processed_people=0;
