@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# Track the script start time
+START_TIME=$(date +%s)
+
 #
 # This script will backup photos/videos from the Photos app to a specified directory.
 # It uses the `osxphotos` command-line tool to export photos from the Photos app.
@@ -100,7 +103,6 @@ export_by_person() {
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${person}/${REPORTS_DIR_NAME}";
     osxphotos export \
         --library ${PHOTOS_LIBRARY_DIR} \
-        --verbose \
         --download-missing \
         --use-photokit \
         --exiftool \
@@ -117,6 +119,7 @@ export_by_person() {
     ;
     echo "\033[0;32mFinished processing all photos by person $1\033[0m";  # Changed echo to green output
 }
+# --verbose \
 
 # Cycle through each album to backup
 #for album in "${PHOTO_ALBUMS[@]}"; do
@@ -134,7 +137,7 @@ export_by_person() {
 # echo "\033[0;32mFinished processing all albums\033[0m"
 
 # Export all photos/videos by person, using parallel processing with a maximum number of jobs at once
-max_jobs=1;
+max_jobs=2;
 total_people=${#PEOPLE[@]};
 processed_people=0;
 
@@ -153,5 +156,14 @@ echo "\033[0;32mFinished processing all people\033[0m"
 
 # wait
 echo "All album and person exports have completed."
+
+# Calculate and display the execution time
+END_TIME=$(date +%s)
+ELAPSED_TIME=$((END_TIME - START_TIME))
+HOURS=$((ELAPSED_TIME / 3600))
+MINUTES=$(( (ELAPSED_TIME % 3600) / 60 ))
+SECONDS=$((ELAPSED_TIME % 60))
+
+echo "\033[0;36mTotal execution time: ${HOURS}h ${MINUTES}m ${SECONDS}s\033[0m"
 
 ## --post-command exported "echo {shell_quote,{filepath}{comma}{,+keyword,}} >> {shell_quote,{export_dir}/exported.txt}"
