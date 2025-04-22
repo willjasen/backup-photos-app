@@ -121,11 +121,9 @@ export_by_person() {
 }
 # --verbose \
 
-# Cycle through each album to backup
-#for album in "${PHOTO_ALBUMS[@]}"; do
-#    TIMESTAMP=$(date "+%Y%m%d%H%M%S")
-#    export_album $album
-#done
+#####
+#####  --MAIN SCRIPT--
+#####
 
 # # Export all photos/videos by album, using parallel processing with a maxiumum of 2 concurrent jobs
 # max_jobs=2;
