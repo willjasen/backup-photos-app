@@ -20,12 +20,12 @@ CHECKPOINTS=100;
 FROM_DATE='2025-03-01';
 TO_DATE='2025-04-30';
 
-# Replace empty PHOTO_ALBUMS array with file input.
+# Replace empty PHOTO_ALBUMS array with file input, skipping lines that start with a # sign or are blank.
 ALBUMS_FILE="${PHOTO_BACKUP_DIR}/albums.txt"
 if [[ -f "$ALBUMS_FILE" ]]; then
-    PHOTO_ALBUMS=("${(f)$(<"$ALBUMS_FILE")}")
+    PHOTO_ALBUMS=("${(f)$(grep -v '^\s*#' "$ALBUMS_FILE" | grep -v '^\s*$')}")
 else
-    echo "People file not found: $ALBUMS_FILE"
+    echo "Albums file not found: $ALBUMS_FILE"
     PHOTO_ALBUMS=();
 fi
 
