@@ -12,8 +12,8 @@
 # https://github.com/RhetTbull/osxphotos?tab=readme-ov-file#command-line-reference-export
 #
 
-PHOTO_BACKUP_DIR='/Users/willjasen/Application Data/Syncthing/Photos app';
-PHOTOS_LIBRARY_DIR="/Users/willjasen/Pictures/Photos Library.photoslibrary";
+PHOTO_BACKUP_DIR='/Volumes/tote/Photos/export-photos';
+PHOTOS_LIBRARY_DIR="/Volumes/tote/Photos/Photos Library.photoslibrary";
 REPORTS_DIR_NAME="-reports-";
 CHECKPOINTS=100;
 
@@ -29,10 +29,10 @@ else
     PHOTO_ALBUMS=();
 fi
 
-# Replace empty PEOPLE array with file input.
+# Replace empty PEOPLE array with file input, skipping lines that start with a # sign.
 PEOPLE_FILE="${PHOTO_BACKUP_DIR}/people.txt"
 if [[ -f "$PEOPLE_FILE" ]]; then
-    PEOPLE=("${(f)$(<"$PEOPLE_FILE")}")
+    PEOPLE=("${(f)$(grep -v '^#' "$PEOPLE_FILE")}")
 else
     echo "People file not found: $PEOPLE_FILE"
     PEOPLE=();
@@ -124,19 +124,23 @@ export_by_person() {
 #    export_album $album
 #done
 
+# # Export all photos/videos by album, using parallel processing with a maxiumum of 2 concurrent jobs
+# max_jobs=2;
+# for album in "${PHOTO_ALBUMS[@]}"; do
+#     ((i=i%max_jobs)); ((i++==0)) && wait
+#     export_album "$album" &
+# done
+# wait
+# echo "\033[0;32mFinished processing all albums\033[0m"
 
-#for album in "${PHOTO_ALBUMS[@]}"; do
-#    ( export_album "$album" ) &
-#done
-#wait
-#echo "\033[0;32mFinished processing all albums\033[0m"  # Changed echo to green output
-
-# Export all photos/videos by person
+# Export all photos/videos by person, using parallel processing with a maxiumum of 2 concurrent jobs
+max_jobs=2;
 for person in "${PEOPLE[@]}"; do
-    ( export_by_person $person ) &
+    ((i=i%max_jobs)); ((i++==0)) && wait
+    export_by_person $person &
 done
 wait
-echo "\033[0;32mFinished processing all people\033[0m"  # Changed echo to green output
+echo "\033[0;32mFinished processing all people\033[0m"
 
 # Export all photos between dates
 # export_by_date
