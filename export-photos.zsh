@@ -133,11 +133,17 @@ export_by_person() {
 # wait
 # echo "\033[0;32mFinished processing all albums\033[0m"
 
-# Export all photos/videos by person, using parallel processing with a maxiumum of 2 concurrent jobs
+# Export all photos/videos by person, using parallel processing with a maximum number of jobs at once
 max_jobs=3;
+total_people=${#PEOPLE[@]};
+processed_people=0;
+
 for person in "${PEOPLE[@]}"; do
     ((i=i%max_jobs)); ((i++==0)) && wait
-    export_by_person $person &
+    export_by_person "$person" &
+    ((processed_people++))
+    percentage=$((processed_people * 100 / total_people))
+    echo "\033[0;34mProgress: $percentage% ($processed_people/$total_people)\033[0m"
 done
 wait
 echo "\033[0;32mFinished processing all people\033[0m"
