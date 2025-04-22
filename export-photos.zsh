@@ -155,7 +155,7 @@ echo "\033[0;32mFinished processing all people\033[0m"
 # export_by_date
 
 # wait
-echo "All album and person exports have completed."
+echo "All exports have completed."
 
 # Calculate and display the execution time
 END_TIME=$(date +%s)
