@@ -22,9 +22,9 @@ def unnamed_faces(photos: list[PhotoInfo]) -> list[PhotoInfo]:
         return []
 
     # filter out .png images
-    photos = [p for p in photos if not p.filename.lower().endswith(".png")]
-    if not photos:
-        return []
+    # photos = [p for p in photos if not p.filename.lower().endswith(".png")]
+    # if not photos:
+    #     return []
     
     # filter out photos with "ignore-faces" keyword
     photos = [p for p in photos if "ignore-faces" not in p.keywords]
