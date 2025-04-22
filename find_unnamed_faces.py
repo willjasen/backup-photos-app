@@ -9,6 +9,8 @@ from osxphotos import PhotoInfo
 def unnamed_faces(photos: list[PhotoInfo]) -> list[PhotoInfo]:
     # your query function should take a list of PhotoInfo objects and return a list of PhotoInfo objects (or empty list)"""
 
+    face_quality = -1.0
+
     # filter out photos with no face info
     photos = [p for p in photos if p.face_info]
     if not photos:
@@ -23,12 +25,17 @@ def unnamed_faces(photos: list[PhotoInfo]) -> list[PhotoInfo]:
     photos = [p for p in photos if not p.filename.lower().endswith(".png")]
     if not photos:
         return []
+    
+    # filter out photos with "ignore-faces" keyword
+    photos = [p for p in photos if "ignore-faces" not in p.keywords]
+    if not photos:
+        return []
 
     # find identified face circles with no name
     face_photos = []
     for photo in photos:
         for face in photo.face_info:
-            if face.quality > -1.0 and (face.name is None or face.name.strip() == ""):
+            if face.quality > face_quality and (face.name is None or face.name.strip() == ""):
                 face_photos.append(photo)
                 break
     return face_photos
