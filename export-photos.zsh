@@ -76,7 +76,6 @@ export_album() {
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${album}/${REPORTS_DIR_NAME}"   # Ensure reports directory exists
     osxphotos export \
         --library ${PHOTOS_LIBRARY_DIR} \
-        --verbose \
         --download-missing \
         --use-photokit \
         --exiftool \
@@ -92,6 +91,7 @@ export_album() {
         ;
         echo "\033[0;32mFinished processing album: $album\033[0m"  # Changed echo to green output
 }
+# --verbose \
 
 # Define a function wrapping osxphotos export with default parameters to all photos/videos between two dates
 export_by_date() {
