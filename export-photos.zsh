@@ -23,6 +23,32 @@ CHECKPOINTS=100;
 FROM_DATE='2025-03-01';
 TO_DATE='2025-04-30';
 
+# Parse command-line parameters
+RUN_ALBUMS=false
+RUN_PEOPLE=false
+RUN_DATE=false
+
+# Process command line arguments
+for arg in "$@"; do
+  case $arg in
+    --albums)
+      RUN_ALBUMS=true
+      ;;
+    --people)
+      RUN_PEOPLE=true
+      ;;
+    --date)
+      RUN_DATE=true
+      ;;
+  esac
+done
+
+# If no specific export type is specified, exit with a message
+if [[ "$RUN_ALBUMS" == "false" && "$RUN_PEOPLE" == "false" && "$RUN_DATE" == "false" ]]; then
+    echo "No parameters specified. Please provide --albums, --people, or --date."
+    exit 1
+fi
+
 # Replace empty PHOTO_ALBUMS array with file input, skipping lines that start with a # sign or are blank.
 ALBUMS_FILE="${PHOTO_BACKUP_DIR}/albums.txt"
 if [[ -f "$ALBUMS_FILE" ]]; then
@@ -125,34 +151,42 @@ export_by_person() {
 #####  --MAIN SCRIPT--
 #####
 
-# # Export all photos/videos by album, using parallel processing with a maxiumum number of concurrent jobs
-# max_jobs=2;
-# for album in "${PHOTO_ALBUMS[@]}"; do
-#     ((i=i%max_jobs)); ((i++==0)) && wait
-#     export_album "$album" &
-# done
-# wait
-# echo "\033[0;32mFinished processing all albums\033[0m"
+# Export photos by album if --albums parameter is specified
+if [[ "$RUN_ALBUMS" == "true" ]]; then
+    echo "\033[0;36mRunning album exports\033[0m"
+    max_jobs=3;
+    for album in "${PHOTO_ALBUMS[@]}"; do
+        ((i=i%max_jobs)); ((i++==0)) && wait
+        export_album "$album" &
+    done
+    wait
+    echo "\033[0;32mFinished processing all albums\033[0m"
+fi
 
-# Export all photos/videos by person, using parallel processing with a maximum number of current jobs
-max_jobs=2;
-total_people=${#PEOPLE[@]};
-processed_people=0;
+# Export photos by person if --people parameter is specified
+if [[ "$RUN_PEOPLE" == "true" ]]; then
+    echo "\033[0;36mRunning people exports\033[0m"
+    max_jobs=3;
+    total_people=${#PEOPLE[@]};
+    processed_people=0;
 
-for person in "${PEOPLE[@]}"; do
-    ((i=i%max_jobs)); ((i++==0)) && wait
-    ((processed_people++))
-    percentage=$((processed_people * 100 / total_people))
-    echo "\033[0;34mProgress: $percentage% ($processed_people/$total_people)\033[0m"
-    export_by_person "$person" &
-done
-wait
-echo "\033[0;32mFinished processing all people\033[0m"
+    for person in "${PEOPLE[@]}"; do
+        ((i=i%max_jobs)); ((i++==0)) && wait
+        ((processed_people++))
+        percentage=$((processed_people * 100 / total_people))
+        echo "\033[0;34mProgress: $percentage% ($processed_people/$total_people)\033[0m"
+        export_by_person "$person" &
+    done
+    wait
+    echo "\033[0;32mFinished processing all people\033[0m"
+fi
 
-# Export all photos between dates
-# export_by_date
+# Export photos by date if --date parameter is specified
+if [[ "$RUN_DATE" == "true" ]]; then
+    echo "\033[0;36mRunning date-range export\033[0m"
+    export_by_date
+fi
 
-# wait
 echo "All exports have completed."
 
 # Calculate and display the execution time
