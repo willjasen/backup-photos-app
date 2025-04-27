@@ -99,7 +99,7 @@ export_album() {
 # Define a function to export multiple albums at once
 export_multiple_albums() {
     TIMESTAMP=$(date "+%Y%m%d%H%M%S")
-    local by_album_dir_name="--by-albums--"
+    local by_album_dir_name="--by-album--"
     local album_params=""
     
     # Build the album parameters string
