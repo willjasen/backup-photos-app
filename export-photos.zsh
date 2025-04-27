@@ -71,6 +71,9 @@ fi
 export_album() {
     TIMESTAMP=$(date "+%Y%m%d%H%M%S")
     local album="$1"
+    # More comprehensive escaping for special characters in album names
+    # This handles commas, quotes, spaces, and other special shell characters
+    local escaped_album=$(printf %q "$album")
     local by_album_dir_name="--by-album--";
     echo "\033[0;32mProcessing album: $album\033[0m"  # Changed echo to green output
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${album}/${REPORTS_DIR_NAME}"   # Ensure reports directory exists
@@ -86,12 +89,48 @@ export_album() {
         --checkpoint $CHECKPOINTS \
         --report "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${album}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite" \
         \
-        --album "${album}" \
+        --album "${escaped_album}" \
         "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${album}" \
         ;
         echo "\033[0;32mFinished processing album: $album\033[0m"  # Changed echo to green output
 }
 # --verbose \
+
+# Define a function to export multiple albums at once
+export_multiple_albums() {
+    TIMESTAMP=$(date "+%Y%m%d%H%M%S")
+    local by_album_dir_name="--by-albums--"
+    local album_params=""
+    
+    # Build the album parameters string
+    for album in "${PHOTO_ALBUMS[@]}"; do
+        album_params+="--album \"${album}\" "
+    done
+    
+    echo "\033[0;32mProcessing all albums at once\033[0m"
+    mkdir -p "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${REPORTS_DIR_NAME}"
+    
+    # Use eval to properly handle the multiple --album parameters
+    # Ensure all paths with potential spaces are properly quoted
+    eval "osxphotos export \\
+        --library \"${PHOTOS_LIBRARY_DIR}\" \\
+        --download-missing \\
+        --use-photokit \\
+        --exiftool \\
+        --touch-file \\
+        --sidecar XMP \\
+        --update \\
+        --ramdb \\
+        --checkpoint $CHECKPOINTS \\
+        --report \"${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite\" \\
+        \\
+        --directory "{album}" \\
+        ${album_params} \\
+        \"${PHOTO_BACKUP_DIR}/${by_album_dir_name}\" \\
+        ;"
+        
+    echo "\033[0;32mFinished processing all albums\033[0m"
+}
 
 # Define a function wrapping osxphotos export with default parameters to all photos/videos between two dates
 export_by_date() {
@@ -154,12 +193,23 @@ export_by_person() {
 # Export photos by album if --albums parameter is specified
 if [[ "$RUN_ALBUMS" == "true" ]]; then
     echo "\033[0;36mRunning album exports\033[0m"
-    max_jobs=3;
-    for album in "${PHOTO_ALBUMS[@]}"; do
-        ((i=i%max_jobs)); ((i++==0)) && wait
-        export_album "$album" &
-    done
-    wait
+    
+    # Check if we have any albums to process
+    if [[ ${#PHOTO_ALBUMS[@]} -eq 0 ]]; then
+        echo "No albums found to process."
+    else
+        # Use the new function to process all albums at once
+        export_multiple_albums
+        
+        # Keep the original individual album processing as a comment for reference
+        # max_jobs=3;
+        # for album in "${PHOTO_ALBUMS[@]}"; do
+        #     ((i=i%max_jobs)); ((i++==0)) && wait
+        #     export_album "$album" &
+        # done
+        # wait
+    fi
+    
     echo "\033[0;32mFinished processing all albums\033[0m"
 fi
 
