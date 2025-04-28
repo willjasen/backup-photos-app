@@ -99,36 +99,34 @@ export_album() {
 # Define a function to export multiple albums at once
 export_multiple_albums() {
     TIMESTAMP=$(date "+%Y%m%d%H%M%S")
-    local by_album_dir_name="--by-album--"
-    local album_params=""
+    local by_album_dir_name="--by-albums2--"
+    local album_args=()
     
-    # Build the album parameters string
+    # Build the album arguments array
     for album in "${PHOTO_ALBUMS[@]}"; do
-        album_params+="--album \"${album}\" "
+        album_args+=("--album" "$album")
     done
     
     echo "\033[0;32mProcessing all albums at once\033[0m"
     mkdir -p "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${REPORTS_DIR_NAME}"
     
-    # Use eval to properly handle the multiple --album parameters
-    # Ensure all paths with potential spaces are properly quoted
-    eval "osxphotos export \\
-        --library \"${PHOTOS_LIBRARY_DIR}\" \\
-        --download-missing \\
-        --use-photokit \\
-        --exiftool \\
-        --touch-file \\
-        --sidecar XMP \\
-        --update \\
-        --ramdb \\
-        --checkpoint $CHECKPOINTS \\
-        --report \"${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite\" \\
-        \\
-        --directory "{album}" \\
-        ${album_params} \\
-        \"${PHOTO_BACKUP_DIR}/${by_album_dir_name}\" \\
-        ;"
-        
+    echo "${album_args[@]}"
+    osxphotos export \
+        --library "${PHOTOS_LIBRARY_DIR}" \
+        --download-missing \
+        --use-photokit \
+        --exiftool \
+        --touch-file \
+        --sidecar XMP \
+        --update \
+        --ramdb \
+        --checkpoint $CHECKPOINTS \
+        --report "${PHOTO_BACKUP_DIR}/${by_album_dir_name}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite" \
+        --directory "{album}" \
+        "${album_args[@]}" \
+        "${PHOTO_BACKUP_DIR}/${by_album_dir_name}" \
+        ;
+    
     echo "\033[0;32mFinished processing all albums\033[0m"
 }
 
@@ -186,6 +184,36 @@ export_by_person() {
 }
 # --verbose \
 
+# Define a function to export multiple people at once
+export_multiple_people() {
+    TIMESTAMP=$(date "+%Y%m%d%H%M%S")
+    local by_person_dir_name="--by-person--"
+    local person_params=""
+    # Build the person parameters string
+    for person in "${PEOPLE[@]}"; do
+        person_params+="--person \"${person}\" "
+    done
+    echo "\033[0;32mProcessing all people at once\033[0m"
+    mkdir -p "${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${REPORTS_DIR_NAME}"
+    eval "osxphotos export \\
+        --library \"${PHOTOS_LIBRARY_DIR}\" \\
+        --download-missing \\
+        --use-photokit \\
+        --exiftool \\
+        --touch-file \\
+        --sidecar XMP \\
+        --update \\
+        --ramdb \\
+        --checkpoint $CHECKPOINTS \\
+        --report \"${PHOTO_BACKUP_DIR}/${by_person_dir_name}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite\" \\
+        \\
+        --directory \"{person}\" \\
+        ${person_params} \\
+        \"${PHOTO_BACKUP_DIR}/${by_person_dir_name}\" \\
+        ;"
+    echo "\033[0;32mFinished processing all people\033[0m"
+}
+
 #####
 #####  --MAIN SCRIPT--
 #####
@@ -216,18 +244,29 @@ fi
 # Export photos by person if --people parameter is specified
 if [[ "$RUN_PEOPLE" == "true" ]]; then
     echo "\033[0;36mRunning people exports\033[0m"
-    max_jobs=3;
-    total_people=${#PEOPLE[@]};
-    processed_people=0;
-
-    for person in "${PEOPLE[@]}"; do
-        ((i=i%max_jobs)); ((i++==0)) && wait
-        ((processed_people++))
-        percentage=$((processed_people * 100 / total_people))
-        echo "\033[0;34mProgress: $percentage% ($processed_people/$total_people)\033[0m"
-        export_by_person "$person" &
-    done
-    wait
+    
+    # Check if we have any people to process
+    if [[ ${#PEOPLE[@]} -eq 0 ]]; then
+        echo "No people found to process."
+    else
+        # Use the new function to process all people at once
+        export_multiple_people
+        
+        # Keep the original individual person processing as a comment for reference
+        # max_jobs=3;
+        # total_people=${#PEOPLE[@]};
+        # processed_people=0;
+        #
+        # for person in "${PEOPLE[@]}"; do
+        #     ((i=i%max_jobs)); ((i++==0)) && wait
+        #     ((processed_people++))
+        #     percentage=$((processed_people * 100 / total_people))
+        #     echo "\033[0;34mProgress: $percentage% ($processed_people/$total_people)\033[0m"
+        #     export_by_person "$person" &
+        # done
+        # wait
+    fi
+    
     echo "\033[0;32mFinished processing all people\033[0m"
 fi
 
