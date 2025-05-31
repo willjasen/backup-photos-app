@@ -166,7 +166,7 @@ fi
 # Export photos by person if --people parameter is specified
 if [[ "$RUN_PEOPLE" == "true" ]]; then
     echo "\033[0;36mRunning people exports\033[0m"
-    max_jobs=3;
+    max_jobs=2;
     total_people=${#PEOPLE[@]};
     processed_people=0;
 
