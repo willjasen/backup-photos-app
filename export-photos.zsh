@@ -154,7 +154,7 @@ export_by_person() {
 # Export photos by album if --albums parameter is specified
 if [[ "$RUN_ALBUMS" == "true" ]]; then
     echo "\033[0;36mRunning album exports\033[0m"
-    max_jobs=3;
+    max_jobs=1;
     for album in "${PHOTO_ALBUMS[@]}"; do
         ((i=i%max_jobs)); ((i++==0)) && wait
         export_album "$album" &
@@ -166,7 +166,7 @@ fi
 # Export photos by person if --people parameter is specified
 if [[ "$RUN_PEOPLE" == "true" ]]; then
     echo "\033[0;36mRunning people exports\033[0m"
-    max_jobs=2;
+    max_jobs=1;
     total_people=${#PEOPLE[@]};
     processed_people=0;
 
