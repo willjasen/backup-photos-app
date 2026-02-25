@@ -12,3 +12,10 @@ To increase its speed, it uses the `--ramdb` option to store the database in RAM
 saves to disk every 100 checkpoints/exports.
 
 https://github.com/RhetTbull/osxphotos?tab=readme-ov-file#command-line-reference-export
+
+---
+
+Example commands:
+
+To export albums:
+`./export-photos --albums`
