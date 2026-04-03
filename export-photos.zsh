@@ -20,9 +20,9 @@ START_TIME=$(date +%s)
 # Ensure osxphotos is installed
 if ! command -v osxphotos &>/dev/null; then
     if ! command -v pipx &>/dev/null; then
-        echo "pipx not found, installing via Homebrew..."
-        brew install pipx
-        pipx ensurepath
+        echo "pipx not found, installing via pip3..."
+        pip3 install --user pipx
+        python3 -m pipx ensurepath
     fi
     echo "osxphotos not found, installing via pipx..."
     pipx install osxphotos
