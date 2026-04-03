@@ -1,0 +1,8 @@
+{
+  "photo_backup_dir": "/Volumes/your-drive/Photos/export-photos",
+  "photos_library_dir": "/Volumes/your-drive/Photos/Photos Library.photoslibrary",
+  "reports_dir_name": "-reports-",
+  "checkpoints": 100,
+  "from_date": "2025-03-01",
+  "to_date": "2025-04-30"
+}

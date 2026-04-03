@@ -15,13 +15,18 @@ START_TIME=$(date +%s)
 # https://github.com/RhetTbull/osxphotos?tab=readme-ov-file#command-line-reference-export
 #
 
-PHOTO_BACKUP_DIR='/Volumes/tote/Photos/export-photos';
-PHOTOS_LIBRARY_DIR="/Volumes/tote/Photos/Photos Library.photoslibrary";
-REPORTS_DIR_NAME="-reports-";
-CHECKPOINTS=100;
+CONFIG_FILE="$(dirname "$0")/config.json"
+if [[ ! -f "$CONFIG_FILE" ]]; then
+    echo "Config file not found: $CONFIG_FILE (copy config.example.json to config.json and update values)"
+    exit 1
+fi
 
-FROM_DATE='2025-03-01';
-TO_DATE='2025-04-30';
+PHOTO_BACKUP_DIR=$(jq -r '.photo_backup_dir' "$CONFIG_FILE")
+PHOTOS_LIBRARY_DIR=$(jq -r '.photos_library_dir' "$CONFIG_FILE")
+REPORTS_DIR_NAME=$(jq -r '.reports_dir_name' "$CONFIG_FILE")
+CHECKPOINTS=$(jq -r '.checkpoints' "$CONFIG_FILE")
+FROM_DATE=$(jq -r '.from_date' "$CONFIG_FILE")
+TO_DATE=$(jq -r '.to_date' "$CONFIG_FILE")
 
 # Parse command-line parameters
 RUN_ALBUMS=false
