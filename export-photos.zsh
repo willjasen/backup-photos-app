@@ -15,6 +15,19 @@ START_TIME=$(date +%s)
 # https://github.com/RhetTbull/osxphotos?tab=readme-ov-file#command-line-reference-export
 #
 
+## export PATH="$HOME/.local/bin:$PATH"
+
+# Ensure osxphotos is installed
+if ! command -v osxphotos &>/dev/null; then
+    if ! command -v pipx &>/dev/null; then
+        echo "pipx not found, installing via Homebrew..."
+        brew install pipx
+        pipx ensurepath
+    fi
+    echo "osxphotos not found, installing via pipx..."
+    pipx install osxphotos
+fi
+
 CONFIG_FILE="$(dirname "$0")/config.json"
 if [[ ! -f "$CONFIG_FILE" ]]; then
     echo "Config file not found: $CONFIG_FILE (copy config.example.json to config.json and update values)"
