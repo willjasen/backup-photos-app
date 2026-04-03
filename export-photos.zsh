@@ -101,6 +101,7 @@ fi
 
 # Graceful shutdown on Ctrl+C or SIGTERM
 cleanup() {
+    trap - INT TERM
     echo "\n\033[0;33mInterrupt received, stopping exports...\033[0m"
     kill 0
     exit 130
