@@ -27,6 +27,7 @@ TO_DATE='2025-04-30';
 RUN_ALBUMS=false
 RUN_PEOPLE=false
 RUN_DATE=false
+RUN_ALL=false
 
 # Process command line arguments
 for arg in "$@"; do
@@ -40,12 +41,15 @@ for arg in "$@"; do
     --date)
       RUN_DATE=true
       ;;
+    --all)
+      RUN_ALL=true
+      ;;
   esac
 done
 
 # If no specific export type is specified, exit with a message
-if [[ "$RUN_ALBUMS" == "false" && "$RUN_PEOPLE" == "false" && "$RUN_DATE" == "false" ]]; then
-    echo "No parameters specified. Please provide --albums, --people, or --date."
+if [[ "$RUN_ALBUMS" == "false" && "$RUN_PEOPLE" == "false" && "$RUN_DATE" == "false" && "$RUN_ALL" == "false" ]]; then
+    echo "No parameters specified. Please provide --albums, --people, --date, or --all."
     exit 1
 fi
 
@@ -147,6 +151,28 @@ export_by_person() {
 }
 # --verbose \
 
+export_all() {
+    TIMESTAMP=$(date "+%Y%m%d%H%M%S")
+    local all_dir_name="--all--";
+    echo "\033[0;32mProcessing all photos\033[0m";
+    mkdir -p "${PHOTO_BACKUP_DIR}/${all_dir_name}/${REPORTS_DIR_NAME}";
+    osxphotos export \
+        --library ${PHOTOS_LIBRARY_DIR} \
+        --download-missing \
+        --use-photokit \
+        --exiftool \
+        --touch-file \
+        --sidecar XMP \
+        --update \
+        --ramdb \
+        --checkpoint $CHECKPOINTS \
+        --report "${PHOTO_BACKUP_DIR}/${all_dir_name}/${REPORTS_DIR_NAME}/${TIMESTAMP}.sqlite" \
+        --export-by-date \
+        "${PHOTO_BACKUP_DIR}/${all_dir_name}" \
+        ;
+    echo "\033[0;32mFinished processing all photos\033[0m";
+}
+
 #####
 #####  --MAIN SCRIPT--
 #####
@@ -185,6 +211,12 @@ fi
 if [[ "$RUN_DATE" == "true" ]]; then
     echo "\033[0;36mRunning date-range export\033[0m"
     export_by_date
+fi
+
+# Export all photos if --all parameter is specified
+if [[ "$RUN_ALL" == "true" ]]; then
+    echo "\033[0;36mRunning all-photos export\033[0m"
+    export_all
 fi
 
 echo "All exports have completed."
