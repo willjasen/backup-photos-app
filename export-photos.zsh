@@ -28,6 +28,16 @@ if ! command -v osxphotos &>/dev/null; then
     pipx install osxphotos
 fi
 
+# Ensure exiftool is installed
+if ! command -v exiftool &>/dev/null; then
+    if ! command -v brew &>/dev/null; then
+        echo "exiftool not found and Homebrew is not available. Please install exiftool from https://exiftool.org/"
+        exit 1
+    fi
+    echo "exiftool not found, installing via Homebrew..."
+    brew install exiftool
+fi
+
 CONFIG_FILE="$(dirname "$0")/config.json"
 if [[ ! -f "$CONFIG_FILE" ]]; then
     echo "Config file not found: $CONFIG_FILE (copy config.example.json to config.json and update values)"
