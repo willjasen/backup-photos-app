@@ -99,6 +99,14 @@ else
     PEOPLE=();
 fi
 
+# Graceful shutdown on Ctrl+C or SIGTERM
+cleanup() {
+    echo "\n\033[0;33mInterrupt received, stopping exports...\033[0m"
+    kill 0
+    exit 130
+}
+trap cleanup INT TERM
+
 # Define a function wrapping osxphotos export with default parameters to export an album
 export_album() {
     TIMESTAMP=$(date "+%Y%m%d%H%M%S")
