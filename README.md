@@ -19,5 +19,11 @@ https://github.com/RhetTbull/osxphotos?tab=readme-ov-file#command-line-reference
 
 Example commands:
 
-To export albums:
+To export everything:
+`./export-photos --all`
+
+To export by albums:
 `./export-photos --albums`
+
+To export by people:
+`./export-photos --people`
