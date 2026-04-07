@@ -17,6 +17,61 @@ START_TIME=$(date +%s)
 
 ## export PATH="$HOME/.local/bin:$PATH"
 
+MIN_OSXPHOTOS_VERSION="0.74.0"
+autoload -Uz is-at-least
+
+version_lt() {
+    local left="$1"
+    local right="$2"
+    if is-at-least "$right" "$left"; then
+        echo 0
+    else
+        echo 1
+    fi
+}
+
+upgrade_osxphotos() {
+    if [[ -n "$VIRTUAL_ENV" && -x "$VIRTUAL_ENV/bin/python" ]]; then
+        echo "Upgrading osxphotos in active virtual environment..."
+        "$VIRTUAL_ENV/bin/python" -m pip install --upgrade "osxphotos>=${MIN_OSXPHOTOS_VERSION}" || return 1
+        hash -r
+        return 0
+    fi
+
+    if command -v pipx &>/dev/null; then
+        echo "Upgrading osxphotos via pipx..."
+        pipx upgrade osxphotos || return 1
+        hash -r
+        return 0
+    fi
+
+    return 1
+}
+
+ensure_osxphotos_version() {
+    local current_version
+    current_version=$(osxphotos --version 2>/dev/null | grep -Eo '[0-9]+(\.[0-9]+)+' | head -1)
+
+    if [[ -z "$current_version" ]]; then
+        echo "Unable to determine installed osxphotos version."
+        return 1
+    fi
+
+    if [[ "$(version_lt "$current_version" "$MIN_OSXPHOTOS_VERSION")" == "1" ]]; then
+        echo "Detected osxphotos ${current_version}, but macOS 26 Photos libraries require osxphotos ${MIN_OSXPHOTOS_VERSION} or newer."
+        if ! upgrade_osxphotos; then
+            echo "Failed to upgrade osxphotos automatically. Activate your export environment and run: python -m pip install --upgrade 'osxphotos>=${MIN_OSXPHOTOS_VERSION}'"
+            return 1
+        fi
+
+        current_version=$(osxphotos --version 2>/dev/null | grep -Eo '[0-9]+(\.[0-9]+)+' | head -1)
+        if [[ -z "$current_version" || "$(version_lt "$current_version" "$MIN_OSXPHOTOS_VERSION")" == "1" ]]; then
+            echo "osxphotos upgrade did not reach the required version ${MIN_OSXPHOTOS_VERSION}."
+            return 1
+        fi
+    fi
+}
+
 # Ensure osxphotos is installed
 if ! command -v osxphotos &>/dev/null; then
     if ! command -v pipx &>/dev/null; then
@@ -26,6 +81,10 @@ if ! command -v osxphotos &>/dev/null; then
     fi
     echo "osxphotos not found, installing via pipx..."
     pipx install osxphotos
+fi
+
+if ! ensure_osxphotos_version; then
+    exit 1
 fi
 
 # Ensure exiftool is installed
