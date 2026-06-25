@@ -143,6 +143,18 @@ fi
 # Replace empty PHOTO_ALBUMS array with file input, skipping lines that start with a # sign or are blank.
 ALBUMS_FILE="${PHOTO_BACKUP_DIR}/albums.txt"
 if [[ -f "$ALBUMS_FILE" ]]; then
+    ALBUM_LINES_WITH_COMMAS=$(awk '
+        /^[[:space:]]*#/ || /^[[:space:]]*$/ { next }
+        /,/ { printf "  Line %d: %s\n", NR, $0 }
+    ' "$ALBUMS_FILE")
+
+    if [[ -n "$ALBUM_LINES_WITH_COMMAS" ]]; then
+        echo "\033[0;31mError: Album names in $ALBUMS_FILE cannot contain commas.\033[0m"
+        echo "$ALBUM_LINES_WITH_COMMAS"
+        echo "\033[0;33mRemove the commas from the album entries, then run the script again.\033[0m"
+        exit 1
+    fi
+
     PHOTO_ALBUMS=("${(f)$(grep -v '^\s*#' "$ALBUMS_FILE" | grep -v '^\s*$')}")
 else
     echo "Albums file not found: $ALBUMS_FILE"
