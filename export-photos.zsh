@@ -15,7 +15,11 @@ START_TIME=$(date +%s)
 # https://github.com/RhetTbull/osxphotos?tab=readme-ov-file#command-line-reference-export
 #
 
-## export PATH="$HOME/.local/bin:$PATH"
+SCRIPT_DIR="${0:A:h}"
+
+# Finder-launched apps receive a much smaller PATH than Terminal shells.
+# Prefer this project's virtual environment, then include common macOS paths.
+export PATH="${SCRIPT_DIR}/.venv/bin:${SCRIPT_DIR}/venv/bin:${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:${PATH}"
 
 MIN_OSXPHOTOS_VERSION="0.74.0"
 autoload -Uz is-at-least
@@ -31,9 +35,14 @@ version_lt() {
 }
 
 upgrade_osxphotos() {
-    if [[ -n "$VIRTUAL_ENV" && -x "$VIRTUAL_ENV/bin/python" ]]; then
-        echo "Upgrading osxphotos in active virtual environment..."
-        "$VIRTUAL_ENV/bin/python" -m pip install --upgrade "osxphotos>=${MIN_OSXPHOTOS_VERSION}" || return 1
+    local osxphotos_path
+    local environment_python
+    osxphotos_path=$(command -v osxphotos)
+    environment_python="${osxphotos_path:h}/python"
+
+    if [[ -x "$environment_python" ]]; then
+        echo "Upgrading osxphotos in its virtual environment..."
+        "$environment_python" -m pip install --upgrade "osxphotos>=${MIN_OSXPHOTOS_VERSION}" || return 1
         hash -r
         return 0
     fi
@@ -48,9 +57,45 @@ upgrade_osxphotos() {
     return 1
 }
 
+install_osxphotos() {
+    local environment_dir="${SCRIPT_DIR}/.venv"
+    local environment_python="${environment_dir}/bin/python"
+
+    if [[ ! -x "$environment_python" ]]; then
+        if ! command -v python3 &>/dev/null; then
+            echo "Python 3 is required to install osxphotos."
+            return 1
+        fi
+        echo "Creating a local Python environment for osxphotos..."
+        python3 -m venv "$environment_dir" || return 1
+    fi
+
+    echo "Installing osxphotos in the project's local environment..."
+    "$environment_python" -m pip install --upgrade "osxphotos>=${MIN_OSXPHOTOS_VERSION}" || return 1
+    hash -r
+}
+
+get_osxphotos_version() {
+    local osxphotos_path
+    local environment_python
+    osxphotos_path=$(command -v osxphotos)
+    environment_python="${osxphotos_path:h}/python"
+
+    # Reading package metadata avoids launching the full Photos-aware CLI just
+    # to obtain its version, which can trigger macOS service initialization.
+    if [[ -x "$environment_python" ]]; then
+        "$environment_python" -c \
+            'from importlib.metadata import version; print(version("osxphotos"))' \
+            2>/dev/null
+        return
+    fi
+
+    osxphotos --version 2>/dev/null | grep -Eo '[0-9]+(\.[0-9]+)+' | head -1
+}
+
 ensure_osxphotos_version() {
     local current_version
-    current_version=$(osxphotos --version 2>/dev/null | grep -Eo '[0-9]+(\.[0-9]+)+' | head -1)
+    current_version=$(get_osxphotos_version)
 
     if [[ -z "$current_version" ]]; then
         echo "Unable to determine installed osxphotos version."
@@ -64,7 +109,7 @@ ensure_osxphotos_version() {
             return 1
         fi
 
-        current_version=$(osxphotos --version 2>/dev/null | grep -Eo '[0-9]+(\.[0-9]+)+' | head -1)
+        current_version=$(get_osxphotos_version)
         if [[ -z "$current_version" || "$(version_lt "$current_version" "$MIN_OSXPHOTOS_VERSION")" == "1" ]]; then
             echo "osxphotos upgrade did not reach the required version ${MIN_OSXPHOTOS_VERSION}."
             return 1
@@ -74,13 +119,10 @@ ensure_osxphotos_version() {
 
 # Ensure osxphotos is installed
 if ! command -v osxphotos &>/dev/null; then
-    if ! command -v pipx &>/dev/null; then
-        echo "pipx not found, installing via pip3..."
-        pip3 install --user pipx
-        python3 -m pipx ensurepath
+    if ! install_osxphotos; then
+        echo "Unable to install osxphotos. Run: ${SCRIPT_DIR}/.venv/bin/python -m pip install 'osxphotos>=${MIN_OSXPHOTOS_VERSION}'"
+        exit 1
     fi
-    echo "osxphotos not found, installing via pipx..."
-    pipx install osxphotos
 fi
 
 if ! ensure_osxphotos_version; then
@@ -97,7 +139,7 @@ if ! command -v exiftool &>/dev/null; then
     brew install exiftool
 fi
 
-CONFIG_FILE="$(dirname "$0")/config.json"
+CONFIG_FILE="${SCRIPT_DIR}/config.json"
 if [[ ! -f "$CONFIG_FILE" ]]; then
     echo "Config file not found: $CONFIG_FILE (copy config.example.json to config.json and update values)"
     exit 1

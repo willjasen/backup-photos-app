@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Photos Export</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">LOCAL PHOTO BACKUP</p>
+          <h1>Photos Export</h1>
+          <p class="intro">Choose what to export, maintain your lists, and keep an eye on the run—all from one quiet little dashboard.</p>
+        </div>
+        <div class="status-pill" id="status-pill">
+          <span class="status-dot"></span>
+          <span id="status-label">Ready</span>
+        </div>
+      </header>
+
+      <section class="panel export-panel">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">EXPORT</p>
+            <h2>What should be backed up?</h2>
+          </div>
+          <p class="config-note" id="library-note">Loading configuration…</p>
+        </div>
+
+        <div class="export-grid">
+          <label class="export-option">
+            <input type="checkbox" name="mode" value="albums" checked>
+            <span class="checkmark">A</span>
+            <span>
+              <strong>Albums</strong>
+              <small id="album-count">Loading list…</small>
+            </span>
+          </label>
+          <label class="export-option">
+            <input type="checkbox" name="mode" value="people">
+            <span class="checkmark">P</span>
+            <span>
+              <strong>People</strong>
+              <small id="people-count">Loading list…</small>
+            </span>
+          </label>
+          <label class="export-option" id="date-option">
+            <input type="checkbox" name="mode" value="date">
+            <span class="checkmark">D</span>
+            <span>
+              <strong>Date range</strong>
+              <small id="date-range">Checking dates…</small>
+            </span>
+          </label>
+          <label class="export-option">
+            <input type="checkbox" name="mode" value="all">
+            <span class="checkmark">∞</span>
+            <span>
+              <strong>Everything</strong>
+              <small>All photos and videos</small>
+            </span>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="primary-button" id="start-button">Start export</button>
+          <button class="secondary-button danger" id="stop-button" disabled>Stop export</button>
+          <span class="message" id="export-message" role="status"></span>
+        </div>
+      </section>
+
+      <section class="panel lists-panel">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">LISTS</p>
+            <h2>Albums &amp; people</h2>
+          </div>
+          <p class="config-note" id="list-directory"></p>
+        </div>
+
+        <div class="editor-tabs" role="tablist">
+          <button class="tab active" data-editor="albums" role="tab">Albums</button>
+          <button class="tab" data-editor="people" role="tab">People</button>
+        </div>
+
+        <div class="editor-wrap">
+          <label class="sr-only" for="list-editor">List entries</label>
+          <textarea id="list-editor" spellcheck="false" placeholder="One name per line…"></textarea>
+          <p class="editor-help">One name per line. Blank lines and lines beginning with # are ignored.</p>
+        </div>
+
+        <div class="actions">
+          <button class="primary-button compact" id="save-button">Save lists</button>
+          <span class="message" id="save-message" role="status"></span>
+        </div>
+      </section>
+
+      <section class="panel activity-panel">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">ACTIVITY</p>
+            <h2>Export output</h2>
+          </div>
+          <p class="config-note" id="run-time">No export has run yet.</p>
+        </div>
+        <pre id="log-output" aria-live="polite">Waiting for an export to begin.</pre>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

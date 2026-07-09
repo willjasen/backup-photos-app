@@ -1,5 +1,6 @@
 backup-photos-app.code-workspace
 osxphotos_crash.log
-__pycache__/find_unnamed_faces.cpython-312.pyc
+__pycache__/
+*.pyc
 .DS_Store
 config.json
